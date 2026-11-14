@@ -14,7 +14,7 @@ import FAQSection from './components/FAQSection'
 
 
 const AGENCY_CONFIG = {
-  whatsappNumber: "8801700000000",
+  whatsappNumber: "+8801622214734",
   defaultMessage: "Hello ODISY team! I'm reaching out from your website to discuss a project.",
   smoothScrollOptions: {
     lerp: 0.1,
