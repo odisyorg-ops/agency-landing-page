@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
-import WhatsAppCTA from "../ui/WhatsAppCTA"; // <--- Imported here
+import WhatsAppCTA from "../ui/WhatsAppCTA";
 import bannerPic1 from "../assets/banner (1).jpg";
 import bannerPic2 from "../assets/banner (2).jpg";
 import bannerPic3 from "../assets/banner (3).jpg";
@@ -70,10 +70,10 @@ export const RotatingText = ({
 
     measure();
 
-    // Re-measure once Comfortaa has actually loaded (fallback font differs in width)
+    // Re-measure once Comfortaa has actually loaded
     if (document.fonts?.ready) document.fonts.ready.then(measure);
 
-    // Re-measure when the font size changes (responsive breakpoints)
+    // Re-measure when the font size changes (responsive resizing)
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [words]);
@@ -87,7 +87,7 @@ export const RotatingText = ({
       animate={{ width: currentWidth ?? "auto" }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Hidden measuring copies (not visible, not read by screen readers) */}
+      {/* Hidden measuring copies */}
       <span
         aria-hidden="true"
         className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap"
@@ -120,14 +120,14 @@ export const RotatingText = ({
 };
 
 export const ServiceTickerPill = ({ tags = DEFAULT_TAGS }) => (
-  <div className="">
-    <div className="flex items-center gap-2 justify-center">
+  <div>
+    <div className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] justify-center">
       {/* Subtle live indicator dot */}
-      <span className="relative flex h-2 w-2">
+      <span className="relative flex h-[clamp(0.5rem,1.2vw,0.75rem)] w-[clamp(0.5rem,1.2vw,0.75rem)]">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-700 opacity-75" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-800" />
+        <span className="relative inline-flex h-full w-full rounded-full bg-emerald-800" />
       </span>
-      <span>Available For Work</span>
+      <span className="text-[clamp(0.813rem,1.8vw,0.95rem)] font-medium">Available For Work</span>
     </div>
   </div>
 );
@@ -141,25 +141,42 @@ const Banner = ({
   ctaLabel = "let's talk...",
 }) => {
   return (
-    <section className="relative flex min-h-[100dvh] w-full flex-col justify-between overflow-hidden bg-white pt-32 text-[#111111] sm:pt-40 font-['Comfortaa']">
+    <section 
+      className="relative flex w-full flex-col justify-between overflow-hidden bg-white text-[#111111] font-['Comfortaa']"
+      style={{
+        minHeight: "100dvh",
+        paddingTop: "clamp(6rem, 15vh, 10rem)",
+      }}
+    >
       {/* Top / Center Hero Copy & CTA */}
-      <div className="z-10 mx-auto flex max-w-4xl flex-col items-center px-6 text-center">
+      <div 
+        className="z-10 mx-auto flex w-full flex-col items-center text-center"
+        style={{
+          maxWidth: "min(90vw, 56rem)",
+          paddingLeft: "clamp(1rem, 4vw, 2rem)",
+          paddingRight: "clamp(1rem, 4vw, 2rem)",
+        }}
+      >
         {/* Mini Service Pill */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-7"
+          style={{ marginBottom: "clamp(1.25rem, 3.5vh, 2rem)" }}
         >
           <ServiceTickerPill tags={tags} />
         </motion.div>
 
-        {/* Cohesive Heading with Comfortaa font applied */}
+        {/* Fluid Typography Heading using clamp() */}
         <motion.h1
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-bold tracking-tight text-[#111111] sm:text-6xl md:text-[64px] md:leading-[1.1] font-['Comfortaa']"
+          className="font-bold tracking-tight text-[#111111] font-['Comfortaa']"
+          style={{
+            fontSize: "clamp(1.7rem, 6.2vw, 4rem)",
+            lineHeight: "clamp(1.1, 1.2, 1.25)",
+          }}
         >
           We <RotatingText words={rotatingWords} className="text-[#536878]" />{" "}
           products
@@ -167,12 +184,12 @@ const Banner = ({
           that mean something
         </motion.h1>
 
-        {/* WhatsApp CTA Button with Aura (Imported Component) */}
+        {/* WhatsApp CTA Button with Aura */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
-          className="mt-10"
+          style={{ marginTop: "clamp(2rem, 5vh, 3rem)" }}
         >
           <WhatsAppCTA
             phoneNumber={whatsappNumber}
@@ -182,22 +199,32 @@ const Banner = ({
         </motion.div>
       </div>
 
-      {/* Bottom Single Horizontal Marquee with Imported Images */}
+      {/* Bottom Horizontal Marquee with Imported Images (Fluid Scaling Cards) */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, duration: 0.8, ease: "easeOut" }}
-        className="relative mt-16 w-full overflow-hidden pb-6 pt-8"
+        className="relative w-full overflow-hidden"
+        style={{
+          marginTop: "clamp(3rem, 8vh, 6rem)",
+          paddingBottom: "clamp(1rem, 3vh, 2rem)",
+          paddingTop: "clamp(1.5rem, 4vh, 2.5rem)",
+        }}
       >
         <motion.div
           animate={{ x: ["0%", "-50%"] }}
           transition={{ repeat: Infinity, duration: 32, ease: "linear" }}
-          className="flex w-max gap-6 px-3"
+          className="flex w-max"
+          style={{ gap: "clamp(1rem, 2vw, 1.5rem)", paddingInline: "clamp(0.5rem, 1.5vw, 1rem)" }}
         >
           {[...CARDS_DATA, ...CARDS_DATA].map((card, idx) => (
             <div
               key={`${card.id}-${idx}`}
-              className="group relative h-80 w-80 shrink-0 overflow-hidden rounded-2xl border border-black/10 bg-neutral-100 shadow-xl sm:h-96 sm:w-96"
+              className="group relative shrink-0 overflow-hidden rounded-2xl border border-black/10 bg-neutral-100 shadow-xl"
+              style={{
+                width: "clamp(16rem, 32vw, 24rem)",
+                height: "clamp(16rem, 32vw, 24rem)",
+              }}
             >
               <img
                 src={card.image}

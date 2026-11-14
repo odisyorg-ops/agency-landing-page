@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Menu, X, ArrowRight } from 'lucide-react';
-import WhatsAppCTA from '../ui/WhatsAppCTA'; // Adjust path if needed
+import WhatsAppCTA from '../ui/WhatsAppCTA';
 
 const Navbar = ({
   whatsappNumber = "1234567890",
@@ -12,6 +12,18 @@ const Navbar = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   useEffect(() => {
     let prevScrollPos = window.scrollY;
 
@@ -21,7 +33,7 @@ const Navbar = ({
       // Toggle background style after passing threshold
       setIsScrolled(currentScrollPos > 20);
 
-      // Hide navbar when scrolling down, reveal when scrolling up (or at the very top)
+      // Hide navbar when scrolling down, reveal when scrolling up
       if (prevScrollPos < currentScrollPos && currentScrollPos > 80) {
         setIsVisible(false);
       } else {
@@ -72,24 +84,37 @@ const Navbar = ({
   );
 
   return (
-    <nav className={`fixed top-0 z-[100] w-full transition-all duration-500 ease-in-out ${
-      isVisible ? 'translate-y-0' : '-translate-y-full'
-    } ${
-      isScrolled ? 'border-b border-black/10 bg-white/85 py-3 shadow-sm backdrop-blur-xl' : 'bg-transparent py-6'
-    }`}>
+    <>
+    <nav
+      className={`fixed top-0 z-[100] w-full transition-all duration-500 ease-in-out ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      } ${
+        isScrolled ? 'border-b border-black/10 bg-white/85 shadow-sm backdrop-blur-xl' : 'bg-transparent'
+      }`}
+      style={{
+        paddingBlock: isScrolled ? "clamp(0.75rem, 2vh, 1.25rem)" : "clamp(1.25rem, 3.5vh, 2rem)"
+      }}
+    >
       
-      {/* Container wrapper set to full width with mx-6 on mobile and mx-12 on desktop */}
-      <div className="mx-6 flex max-w-[100vw] items-center justify-between lg:mx-12">
+      {/* Container wrapper set with fluid horizontal padding */}
+      <div 
+        className="flex items-center justify-between mx-12"
         
-        {/* LOGO (Comfortaa font applied ONLY here) */}
+      >
+        
+        {/* LOGO */}
         <div className="flex-shrink-0">
-          <a href="#" className="flex items-center gap-0.5 font-['Comfortaa'] text-3xl font-bold text-black">
+          <a 
+            href="#" 
+            className="flex items-center gap-0.5 font-['Comfortaa'] font-bold text-black"
+            style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)" }}
+          >
             ODISY<span className="text-[#536878]">.</span>
           </a>
         </div>
 
-        {/* DESKTOP NAV */}
-        <div className="hidden items-center gap-2 lg:flex">
+        {/* DESKTOP NAV (Hidden on smaller screens using media query via custom style/class) */}
+        <div className="hidden items-center gap-2 [@media(min-width:1024px)]:flex">
           {navGroups.map((group, idx) => (
             <div 
               key={idx} 
@@ -98,7 +123,7 @@ const Navbar = ({
               onMouseLeave={() => group.items && setHoveredIndex(null)}
             >
               {group.items ? (
-                <button className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-bold transition-all ${
+                <button className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-bold transition-all cursor-pointer ${
                   hoveredIndex === idx ? 'text-[#536878]' : 'text-black hover:text-[#536878]'
                 }`}>
                   {group.label}
@@ -132,8 +157,8 @@ const Navbar = ({
           ))}
         </div>
 
-        {/* DESKTOP CTA ACTION BUTTON (Imported WhatsAppCTA) */}
-        <div className="hidden items-center lg:flex">
+        {/* DESKTOP CTA ACTION BUTTON */}
+        <div className="hidden items-center [@media(min-width:1024px)]:flex">
           <WhatsAppCTA
             phoneNumber={whatsappNumber}
             message={whatsappMessage}
@@ -141,44 +166,69 @@ const Navbar = ({
           />
         </div>
 
-        {/* MOBILE MENU TOGGLE */}
+        {/* MOBILE MENU TOGGLE BUTTON (Visible only below 1024px) */}
         <button 
           onClick={() => setIsMobileMenuOpen(true)} 
-          className="rounded-xl border border-black/15 p-2 text-black transition-colors hover:bg-black/5 lg:hidden"
+          aria-label="Open Menu"
+          className="rounded-xl border border-black/15 p-2 text-black transition-colors hover:bg-black/5 [@media(min-width:1024px)]:hidden cursor-pointer"
         >
           <Menu size={24} />
         </button>
       </div>
+      </nav>
 
-      {/* MOBILE FULLSCREEN MENU */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            className="fixed inset-0 z-[150] flex flex-col overflow-y-auto bg-white p-6 text-black"
-          >
-            <div className="mb-10 flex items-center justify-between">
-              <span className="font-['Comfortaa'] text-2xl font-bold text-black">
+      {/* MOBILE FULLSCREEN MENU OVERLAY */}
+       <AnimatePresence>
+      {isMobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="fixed inset-0 z-[150] flex flex-col overflow-y-auto bg-white text-black"
+          style={{ padding: "clamp(1.5rem, 5vw, 2.5rem)" }}
+        >
+            {/* Header in overlay */}
+            <div className="flex items-center justify-between w-full">
+              <span 
+                className="font-['Comfortaa'] font-bold text-black"
+                style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)" }}
+              >
                 ODISY<span className="text-[#536878]">.</span>
               </span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="rounded-full border border-black/15 bg-black/5 p-3 text-black">
+              
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                aria-label="Close Menu"
+                className="rounded-full border border-black/15 bg-black/5 p-3 text-black cursor-pointer"
+              >
                 <X size={24} />
               </button>
             </div>
             
-            <div className="space-y-8 pb-12">
+            {/* Menu Links */}
+            <div className="flex flex-col space-y-6 my-auto py-8">
               {navGroups.map((group, idx) => (
                 <div key={idx}>
                   {group.items ? (
-                    <div>
-                      <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#536878]">{group.label}</p>
-                      <div className="grid gap-4 pl-2">
+                    <div className="space-y-3">
+                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#536878]">
+                        {group.label}
+                      </p>
+                      <div className="grid gap-3 pl-2 border-l border-[#536878]/20">
                         {group.items.map((item, i) => (
-                          <a key={i} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className="group">
-                            <p className="text-lg font-bold text-black group-active:text-[#536878]">{item.title}</p>
-                            <p className="mt-0.5 text-xs text-black/60">{item.desc}</p>
+                          <a 
+                            key={i} 
+                            href={item.href} 
+                            onClick={() => setIsMobileMenuOpen(false)} 
+                            className="group block py-1"
+                          >
+                            <p className="text-base font-bold text-black active:text-[#536878]">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-black/60">
+                              {item.desc}
+                            </p>
                           </a>
                         ))}
                       </div>
@@ -196,19 +246,18 @@ const Navbar = ({
               ))}
             </div>
 
-            {/* MOBILE CTA ACTION BUTTON (Imported WhatsAppCTA) */}
-            <div className="mt-auto border-t border-black/10 pt-6">
+            {/* Mobile CTA Action Footer */}
+            <div className="mt-auto border-t border-black/10 pt-6 w-full">
               <WhatsAppCTA
                 phoneNumber={whatsappNumber}
                 message={whatsappMessage}
                 label="Book a call"
-                className="w-full [&>a]:w-full [&>a]:justify-center"
               />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+         </motion.div>
+      )}
+    </AnimatePresence>
+     </>
   );
 };
 
