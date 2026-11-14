@@ -4,7 +4,7 @@ import { ChevronDown, Menu, X, ArrowRight } from 'lucide-react';
 import WhatsAppCTA from '../ui/WhatsAppCTA';
 
 const Navbar = ({
-  whatsappNumber = "1234567890",
+  whatsappNumber = "+8801622214734",
   whatsappMessage = "Hi! I'd love to book a call to discuss a project.",
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);

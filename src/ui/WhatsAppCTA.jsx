@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import React from "react";
 
 export const WhatsAppCTA = ({
-  phoneNumber = "1234567890", // Replace with your WhatsApp number (with country code, no '+')
+  phoneNumber = "+8801622214734", // Replace with your WhatsApp number (with country code, no '+')
   message = "Hi! I'd love to discuss a project with you.",
   label = "let's talk...",
   className = "",
